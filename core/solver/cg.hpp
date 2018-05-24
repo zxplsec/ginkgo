@@ -131,7 +131,7 @@ protected:
                 parameters_.preconditioner->generate(system_matrix_);
         } else {
             preconditioner_ = matrix::Identity<ValueType>::create(
-                this->get_executor(), this->get_size().num_rows);
+                this->get_executor(), this->get_size()[0]);
         }
     }
 

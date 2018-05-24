@@ -117,7 +117,7 @@ TEST_F(Dense, AppliesLinearCombinationToDense)
 
 TEST_F(Dense, ApplyFailsOnWrongInnerDimension)
 {
-    auto res = gko::matrix::Dense<>::create(exec, gko::dim{2});
+    auto res = gko::matrix::Dense<>::create(exec, gko::dim<2>{2});
 
     ASSERT_THROW(mtx2->apply(mtx1.get(), res.get()), gko::DimensionMismatch);
 }
@@ -125,7 +125,7 @@ TEST_F(Dense, ApplyFailsOnWrongInnerDimension)
 
 TEST_F(Dense, ApplyFailsOnWrongNumberOfRows)
 {
-    auto res = gko::matrix::Dense<>::create(exec, gko::dim{3});
+    auto res = gko::matrix::Dense<>::create(exec, gko::dim<2>{3});
 
     ASSERT_THROW(mtx1->apply(mtx2.get(), res.get()), gko::DimensionMismatch);
 }
@@ -133,7 +133,7 @@ TEST_F(Dense, ApplyFailsOnWrongNumberOfRows)
 
 TEST_F(Dense, ApplyFailsOnWrongNumberOfCols)
 {
-    auto res = gko::matrix::Dense<>::create(exec, gko::dim{2}, 3);
+    auto res = gko::matrix::Dense<>::create(exec, gko::dim<2>{2}, 3);
 
     ASSERT_THROW(mtx1->apply(mtx2.get(), res.get()), gko::DimensionMismatch);
 }
@@ -212,7 +212,7 @@ TEST_F(Dense, AddsScaledWithScalar)
 
 TEST_F(Dense, AddScaledFailsOnWrongSizes)
 {
-    auto alpha = gko::matrix::Dense<>::create(exec, gko::dim{1, 2});
+    auto alpha = gko::matrix::Dense<>::create(exec, gko::dim<2>{1, 2});
 
     ASSERT_THROW(mtx1->add_scaled(alpha.get(), mtx2.get()),
                  gko::DimensionMismatch);
@@ -221,7 +221,7 @@ TEST_F(Dense, AddScaledFailsOnWrongSizes)
 
 TEST_F(Dense, ComputesDot)
 {
-    auto result = gko::matrix::Dense<>::create(exec, gko::dim{1, 3});
+    auto result = gko::matrix::Dense<>::create(exec, gko::dim<2>{1, 3});
 
     mtx1->compute_dot(mtx3.get(), result.get());
 
@@ -233,7 +233,7 @@ TEST_F(Dense, ComputesDot)
 
 TEST_F(Dense, ComputDotFailsOnWrongInputSize)
 {
-    auto result = gko::matrix::Dense<>::create(exec, gko::dim{1, 3});
+    auto result = gko::matrix::Dense<>::create(exec, gko::dim<2>{1, 3});
 
     ASSERT_THROW(mtx1->compute_dot(mtx2.get(), result.get()),
                  gko::DimensionMismatch);
@@ -242,7 +242,7 @@ TEST_F(Dense, ComputDotFailsOnWrongInputSize)
 
 TEST_F(Dense, ComputDotFailsOnWrongResultSize)
 {
-    auto result = gko::matrix::Dense<>::create(exec, gko::dim{1, 2});
+    auto result = gko::matrix::Dense<>::create(exec, gko::dim<2>{1, 2});
 
     ASSERT_THROW(mtx1->compute_dot(mtx3.get(), result.get()),
                  gko::DimensionMismatch);
@@ -259,7 +259,7 @@ TEST_F(Dense, ConvertsToCoo)
     auto c = coo_mtx->get_const_col_idxs();
     auto r = coo_mtx->get_const_row_idxs();
 
-    ASSERT_EQ(coo_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(coo_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(coo_mtx->get_num_stored_elements(), 4);
     EXPECT_EQ(r[0], 0);
     EXPECT_EQ(r[1], 0);
@@ -286,7 +286,7 @@ TEST_F(Dense, MovesToCoo)
     auto c = coo_mtx->get_const_col_idxs();
     auto r = coo_mtx->get_const_row_idxs();
 
-    ASSERT_EQ(coo_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(coo_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(coo_mtx->get_num_stored_elements(), 4);
     EXPECT_EQ(r[0], 0);
     EXPECT_EQ(r[1], 0);
@@ -313,7 +313,7 @@ TEST_F(Dense, ConvertsToCsr)
     auto c = csr_mtx->get_const_col_idxs();
     auto r = csr_mtx->get_const_row_ptrs();
 
-    ASSERT_EQ(csr_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(csr_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(csr_mtx->get_num_stored_elements(), 4);
     EXPECT_EQ(r[0], 0);
     EXPECT_EQ(r[1], 3);
@@ -339,7 +339,7 @@ TEST_F(Dense, MovesToCsr)
     auto c = csr_mtx->get_const_col_idxs();
     auto r = csr_mtx->get_const_row_ptrs();
 
-    ASSERT_EQ(csr_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(csr_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(csr_mtx->get_num_stored_elements(), 4);
     EXPECT_EQ(r[0], 0);
     EXPECT_EQ(r[1], 3);
@@ -364,7 +364,7 @@ TEST_F(Dense, ConvertsToEll)
     auto v = ell_mtx->get_const_values();
     auto c = ell_mtx->get_const_col_idxs();
 
-    ASSERT_EQ(ell_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(ell_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(ell_mtx->get_num_stored_elements_per_row(), 2);
     ASSERT_EQ(ell_mtx->get_num_stored_elements(), 4);
     ASSERT_EQ(ell_mtx->get_stride(), 2);
@@ -388,7 +388,7 @@ TEST_F(Dense, MovesToEll)
     auto v = ell_mtx->get_const_values();
     auto c = ell_mtx->get_const_col_idxs();
 
-    ASSERT_EQ(ell_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(ell_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(ell_mtx->get_num_stored_elements_per_row(), 2);
     ASSERT_EQ(ell_mtx->get_num_stored_elements(), 4);
     ASSERT_EQ(ell_mtx->get_stride(), 2);
@@ -406,14 +406,14 @@ TEST_F(Dense, MovesToEll)
 TEST_F(Dense, ConvertsToEllWithStride)
 {
     auto ell_mtx =
-        gko::matrix::Ell<>::create(mtx7->get_executor(), gko::dim{}, 0, 3);
+        gko::matrix::Ell<>::create(mtx7->get_executor(), gko::dim<2>{}, 0, 3);
 
     mtx7->convert_to(ell_mtx.get());
 
     auto v = ell_mtx->get_const_values();
     auto c = ell_mtx->get_const_col_idxs();
 
-    ASSERT_EQ(ell_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(ell_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(ell_mtx->get_num_stored_elements_per_row(), 2);
     ASSERT_EQ(ell_mtx->get_num_stored_elements(), 6);
     ASSERT_EQ(ell_mtx->get_stride(), 3);
@@ -435,14 +435,14 @@ TEST_F(Dense, ConvertsToEllWithStride)
 TEST_F(Dense, MovesToEllWithStride)
 {
     auto ell_mtx =
-        gko::matrix::Ell<>::create(mtx7->get_executor(), gko::dim{}, 0, 3);
+        gko::matrix::Ell<>::create(mtx7->get_executor(), gko::dim<2>{}, 0, 3);
 
     mtx7->move_to(ell_mtx.get());
 
     auto v = ell_mtx->get_const_values();
     auto c = ell_mtx->get_const_col_idxs();
 
-    ASSERT_EQ(ell_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(ell_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(ell_mtx->get_num_stored_elements_per_row(), 2);
     ASSERT_EQ(ell_mtx->get_num_stored_elements(), 6);
     ASSERT_EQ(ell_mtx->get_stride(), 3);
@@ -471,7 +471,7 @@ TEST_F(Dense, MovesToHybridAutomatically)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 6);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 0);
     EXPECT_EQ(n, 3);
@@ -501,7 +501,7 @@ TEST_F(Dense, ConvertsToHybridAutomatically)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 6);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 0);
     EXPECT_EQ(n, 3);
@@ -524,7 +524,7 @@ TEST_F(Dense, ConvertsToHybridAutomatically)
 TEST_F(Dense, MovesToHybridWithStrideAutomatically)
 {
     auto hybrid_mtx =
-        gko::matrix::Hybrid<>::create(mtx4->get_executor(), gko::dim{}, 0, 3);
+        gko::matrix::Hybrid<>::create(mtx4->get_executor(), gko::dim<2>{}, 0, 3);
 
     mtx4->move_to(hybrid_mtx.get());
 
@@ -532,7 +532,7 @@ TEST_F(Dense, MovesToHybridWithStrideAutomatically)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 9);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 0);
     EXPECT_EQ(n, 3);
@@ -561,7 +561,7 @@ TEST_F(Dense, MovesToHybridWithStrideAutomatically)
 TEST_F(Dense, ConvertsToHybridWithStrideAutomatically)
 {
     auto hybrid_mtx =
-        gko::matrix::Hybrid<>::create(mtx4->get_executor(), gko::dim{}, 0, 3);
+        gko::matrix::Hybrid<>::create(mtx4->get_executor(), gko::dim<2>{}, 0, 3);
 
     mtx4->convert_to(hybrid_mtx.get());
 
@@ -569,7 +569,7 @@ TEST_F(Dense, ConvertsToHybridWithStrideAutomatically)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 9);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 0);
     EXPECT_EQ(n, 3);
@@ -598,7 +598,7 @@ TEST_F(Dense, ConvertsToHybridWithStrideAutomatically)
 TEST_F(Dense, MovesToHybridWithStrideAndCooLengthByColumns2)
 {
     auto hybrid_mtx = gko::matrix::Hybrid<>::create(
-        mtx4->get_executor(), gko::dim{}, 0, 3, 3,
+        mtx4->get_executor(), gko::dim<2>{}, 0, 3, 3,
         std::make_shared<gko::matrix::Hybrid<>::column_limit>(2));
 
     mtx4->move_to(hybrid_mtx.get());
@@ -607,7 +607,7 @@ TEST_F(Dense, MovesToHybridWithStrideAndCooLengthByColumns2)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 6);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 3);
     EXPECT_EQ(n, 2);
@@ -639,7 +639,7 @@ TEST_F(Dense, MovesToHybridWithStrideAndCooLengthByColumns2)
 TEST_F(Dense, ConvertsToHybridWithStrideAndCooLengthByColumns2)
 {
     auto hybrid_mtx = gko::matrix::Hybrid<>::create(
-        mtx4->get_executor(), gko::dim{}, 0, 3, 3,
+        mtx4->get_executor(), gko::dim<2>{}, 0, 3, 3,
         std::make_shared<gko::matrix::Hybrid<>::column_limit>(2));
 
     mtx4->convert_to(hybrid_mtx.get());
@@ -648,7 +648,7 @@ TEST_F(Dense, ConvertsToHybridWithStrideAndCooLengthByColumns2)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 6);
     ASSERT_EQ(hybrid_mtx->get_coo_num_stored_elements(), 3);
     EXPECT_EQ(n, 2);
@@ -680,7 +680,7 @@ TEST_F(Dense, ConvertsToHybridWithStrideAndCooLengthByColumns2)
 TEST_F(Dense, MovesToHybridWithStrideByPercent40)
 {
     auto hybrid_mtx = gko::matrix::Hybrid<>::create(
-        mtx4->get_executor(), gko::dim{}, 0, 3,
+        mtx4->get_executor(), gko::dim<2>{}, 0, 3,
         std::make_shared<gko::matrix::Hybrid<>::imbalance_limit>(0.4));
 
     mtx4->move_to(hybrid_mtx.get());
@@ -689,7 +689,7 @@ TEST_F(Dense, MovesToHybridWithStrideByPercent40)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 3);
     EXPECT_EQ(n, 1);
     EXPECT_EQ(p, 3);
@@ -716,7 +716,7 @@ TEST_F(Dense, MovesToHybridWithStrideByPercent40)
 TEST_F(Dense, ConvertsToHybridWithStrideByPercent40)
 {
     auto hybrid_mtx = gko::matrix::Hybrid<>::create(
-        mtx4->get_executor(), gko::dim{}, 0, 3,
+        mtx4->get_executor(), gko::dim<2>{}, 0, 3,
         std::make_shared<gko::matrix::Hybrid<>::imbalance_limit>(0.4));
 
     mtx4->convert_to(hybrid_mtx.get());
@@ -725,7 +725,7 @@ TEST_F(Dense, ConvertsToHybridWithStrideByPercent40)
     auto c = hybrid_mtx->get_const_ell_col_idxs();
     auto n = hybrid_mtx->get_ell_num_stored_elements_per_row();
     auto p = hybrid_mtx->get_ell_stride();
-    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim(2, 3));
+    ASSERT_EQ(hybrid_mtx->get_size(), gko::dim<2>(2, 3));
     ASSERT_EQ(hybrid_mtx->get_ell_num_stored_elements(), 3);
     EXPECT_EQ(n, 1);
     EXPECT_EQ(p, 3);

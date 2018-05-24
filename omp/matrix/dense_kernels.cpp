@@ -53,16 +53,16 @@ void simple_apply(std::shared_ptr<const OmpExecutor> exec,
                   matrix::Dense<ValueType> *c)
 {
 #pragma omp parallel for
-    for (size_type row = 0; row < c->get_size().num_rows; ++row) {
-        for (size_type col = 0; col < c->get_size().num_cols; ++col) {
+    for (size_type row = 0; row < c->get_size()[0]; ++row) {
+        for (size_type col = 0; col < c->get_size()[1]; ++col) {
             c->at(row, col) = zero<ValueType>();
         }
     }
 
 #pragma omp parallel for
-    for (size_type row = 0; row < c->get_size().num_rows; ++row) {
-        for (size_type inner = 0; inner < a->get_size().num_cols; ++inner) {
-            for (size_type col = 0; col < c->get_size().num_cols; ++col) {
+    for (size_type row = 0; row < c->get_size()[0]; ++row) {
+        for (size_type inner = 0; inner < a->get_size()[1]; ++inner) {
+            for (size_type col = 0; col < c->get_size()[1]; ++col) {
                 c->at(row, col) += a->at(row, inner) * b->at(inner, col);
             }
         }
@@ -80,24 +80,24 @@ void apply(std::shared_ptr<const OmpExecutor> exec,
 {
     if (beta->at(0, 0) != zero<ValueType>()) {
 #pragma omp parallel for
-        for (size_type row = 0; row < c->get_size().num_rows; ++row) {
-            for (size_type col = 0; col < c->get_size().num_cols; ++col) {
+        for (size_type row = 0; row < c->get_size()[0]; ++row) {
+            for (size_type col = 0; col < c->get_size()[1]; ++col) {
                 c->at(row, col) *= beta->at(0, 0);
             }
         }
     } else {
 #pragma omp parallel for
-        for (size_type row = 0; row < c->get_size().num_rows; ++row) {
-            for (size_type col = 0; col < c->get_size().num_cols; ++col) {
+        for (size_type row = 0; row < c->get_size()[0]; ++row) {
+            for (size_type col = 0; col < c->get_size()[1]; ++col) {
                 c->at(row, col) *= zero<ValueType>();
             }
         }
     }
 
 #pragma omp parallel for
-    for (size_type row = 0; row < c->get_size().num_rows; ++row) {
-        for (size_type inner = 0; inner < a->get_size().num_cols; ++inner) {
-            for (size_type col = 0; col < c->get_size().num_cols; ++col) {
+    for (size_type row = 0; row < c->get_size()[0]; ++row) {
+        for (size_type inner = 0; inner < a->get_size()[1]; ++inner) {
+            for (size_type col = 0; col < c->get_size()[1]; ++col) {
                 c->at(row, col) +=
                     alpha->at(0, 0) * a->at(row, inner) * b->at(inner, col);
             }
@@ -112,17 +112,17 @@ template <typename ValueType>
 void scale(std::shared_ptr<const OmpExecutor> exec,
            const matrix::Dense<ValueType> *alpha, matrix::Dense<ValueType> *x)
 {
-    if (alpha->get_size().num_cols == 1) {
+    if (alpha->get_size()[1] == 1) {
 #pragma omp parallel for
-        for (size_type i = 0; i < x->get_size().num_rows; ++i) {
-            for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+        for (size_type i = 0; i < x->get_size()[0]; ++i) {
+            for (size_type j = 0; j < x->get_size()[1]; ++j) {
                 x->at(i, j) *= alpha->at(0, 0);
             }
         }
     } else {
 #pragma omp parallel for
-        for (size_type i = 0; i < x->get_size().num_rows; ++i) {
-            for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+        for (size_type i = 0; i < x->get_size()[0]; ++i) {
+            for (size_type j = 0; j < x->get_size()[1]; ++j) {
                 x->at(i, j) *= alpha->at(0, j);
             }
         }
@@ -137,17 +137,17 @@ void add_scaled(std::shared_ptr<const OmpExecutor> exec,
                 const matrix::Dense<ValueType> *alpha,
                 const matrix::Dense<ValueType> *x, matrix::Dense<ValueType> *y)
 {
-    if (alpha->get_size().num_cols == 1) {
+    if (alpha->get_size()[1] == 1) {
 #pragma omp parallel for
-        for (size_type i = 0; i < x->get_size().num_rows; ++i) {
-            for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+        for (size_type i = 0; i < x->get_size()[0]; ++i) {
+            for (size_type j = 0; j < x->get_size()[1]; ++j) {
                 y->at(i, j) += alpha->at(0, 0) * x->at(i, j);
             }
         }
     } else {
 #pragma omp parallel for
-        for (size_type i = 0; i < x->get_size().num_rows; ++i) {
-            for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+        for (size_type i = 0; i < x->get_size()[0]; ++i) {
+            for (size_type j = 0; j < x->get_size()[1]; ++j) {
                 y->at(i, j) += alpha->at(0, j) * x->at(i, j);
             }
         }
@@ -164,12 +164,12 @@ void compute_dot(std::shared_ptr<const OmpExecutor> exec,
                  matrix::Dense<ValueType> *result)
 {
 #pragma omp parallel for
-    for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+    for (size_type j = 0; j < x->get_size()[1]; ++j) {
         result->at(0, j) = zero<ValueType>();
     }
-    for (size_type i = 0; i < x->get_size().num_rows; ++i) {
+    for (size_type i = 0; i < x->get_size()[0]; ++i) {
 #pragma omp parallel for
-        for (size_type j = 0; j < x->get_size().num_cols; ++j) {
+        for (size_type j = 0; j < x->get_size()[1]; ++j) {
             result->at(0, j) += conj(x->at(i, j)) * y->at(i, j);
         }
     }
@@ -245,8 +245,8 @@ template <typename ValueType>
 void count_nonzeros(std::shared_ptr<const OmpExecutor> exec,
                     const matrix::Dense<ValueType> *source, size_type *result)
 {
-    auto num_rows = source->get_size().num_rows;
-    auto num_cols = source->get_size().num_cols;
+    auto num_rows = source->get_size()[0];
+    auto num_cols = source->get_size()[1];
     auto num_nonzeros = 0;
 
 #pragma omp parallel for
@@ -267,8 +267,8 @@ void calculate_max_nnz_per_row(std::shared_ptr<const OmpExecutor> exec,
                                     const matrix::Dense<ValueType> *source,
                                     size_type *result)
 {
-    const auto num_rows = source->get_size().num_rows;
-    const auto num_cols = source->get_size().num_cols;
+    const auto num_rows = source->get_size()[0];
+    const auto num_cols = source->get_size()[1];
     size_type max_nonzeros_per_row = 0;
     size_type num_nonzeros = 0;
 #pragma omp parallel for reduction(max : max_nonzeros_per_row)
@@ -301,8 +301,8 @@ void transpose(std::shared_ptr<const OmpExecutor> exec,
                const matrix::Dense<ValueType> *orig)
 {
 #pragma omp parallel for
-    for (size_type i = 0; i < orig->get_size().num_rows; ++i) {
-        for (size_type j = 0; j < orig->get_size().num_cols; ++j) {
+    for (size_type i = 0; i < orig->get_size()[0]; ++i) {
+        for (size_type j = 0; j < orig->get_size()[1]; ++j) {
             trans->at(j, i) = orig->at(i, j);
         }
     }
@@ -317,8 +317,8 @@ void conj_transpose(std::shared_ptr<const OmpExecutor> exec,
                     const matrix::Dense<ValueType> *orig)
 {
 #pragma omp parallel for
-    for (size_type i = 0; i < orig->get_size().num_rows; ++i) {
-        for (size_type j = 0; j < orig->get_size().num_cols; ++j) {
+    for (size_type i = 0; i < orig->get_size()[0]; ++i) {
+        for (size_type j = 0; j < orig->get_size()[1]; ++j) {
             trans->at(j, i) = conj(orig->at(i, j));
         }
     }

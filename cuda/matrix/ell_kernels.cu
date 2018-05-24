@@ -83,10 +83,10 @@ void spmv(std::shared_ptr<const CudaExecutor> exec,
           const matrix::Dense<ValueType> *b, matrix::Dense<ValueType> *c)
 {
     const dim3 block_size(default_block_size, 1, 1);
-    const dim3 grid_size(ceildiv(a->get_size().num_rows, block_size.x), 1, 1);
+    const dim3 grid_size(ceildiv(a->get_size()[0], block_size.x), 1, 1);
 
     spmv_kernel<<<grid_size, block_size, 0, 0>>>(
-        a->get_size().num_rows, as_cuda_type(a->get_const_values()),
+        a->get_size()[0], as_cuda_type(a->get_const_values()),
         a->get_const_col_idxs(), a->get_stride(), a->get_num_stored_elements_per_row(),
         as_cuda_type(b->get_const_values()), as_cuda_type(c->get_values()));
 }
@@ -131,10 +131,10 @@ void advanced_spmv(std::shared_ptr<const CudaExecutor> exec,
                    matrix::Dense<ValueType> *c)
 {
     const dim3 block_size(default_block_size, 1, 1);
-    const dim3 grid_size(ceildiv(a->get_size().num_rows, block_size.x), 1, 1);
+    const dim3 grid_size(ceildiv(a->get_size()[0], block_size.x), 1, 1);
 
     advanced_spmv_kernel<<<grid_size, block_size, 0, 0>>>(
-        a->get_size().num_rows, as_cuda_type(alpha->get_const_values()),
+        a->get_size()[0], as_cuda_type(alpha->get_const_values()),
         as_cuda_type(a->get_const_values()), a->get_const_col_idxs(),
         a->get_stride(), a->get_num_stored_elements_per_row(),
         as_cuda_type(b->get_const_values()),

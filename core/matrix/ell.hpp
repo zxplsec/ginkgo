@@ -209,8 +209,8 @@ protected:
      * @param exec  Executor associated to the matrix
      * @param size  size of the matrix
      */
-    Ell(std::shared_ptr<const Executor> exec, const dim &size = dim{})
-        : Ell(std::move(exec), size, size.num_cols)
+    Ell(std::shared_ptr<const Executor> exec, const dim<2> &size = dim<2>{})
+        : Ell(std::move(exec), size, size[1])
     {}
 
     /**
@@ -222,9 +222,9 @@ protected:
      * @param num_stored_elements_per_row   the number of stored elements per
      *                                      row
      */
-    Ell(std::shared_ptr<const Executor> exec, const dim &size,
+    Ell(std::shared_ptr<const Executor> exec, const dim<2> &size,
         size_type num_stored_elements_per_row)
-        : Ell(std::move(exec), size, num_stored_elements_per_row, size.num_rows)
+        : Ell(std::move(exec), size, num_stored_elements_per_row, size[0])
     {}
 
     /**
@@ -236,7 +236,7 @@ protected:
      *                                      row
      * @param stride                stride of the rows
      */
-    Ell(std::shared_ptr<const Executor> exec, const dim &size,
+    Ell(std::shared_ptr<const Executor> exec, const dim<2> &size,
         size_type num_stored_elements_per_row, size_type stride)
         : EnableLinOp<Ell>(exec, size),
           values_(exec, stride * num_stored_elements_per_row),
@@ -267,7 +267,7 @@ protected:
      *       array data will not be used in the matrix.
      */
     template <typename ValuesArray, typename ColIdxsArray>
-    Ell(std::shared_ptr<const Executor> exec, const dim &size,
+    Ell(std::shared_ptr<const Executor> exec, const dim<2> &size,
         ValuesArray &&values, ColIdxsArray &&col_idxs,
         size_type num_stored_elements_per_row, size_type stride)
         : EnableLinOp<Ell>(exec, size),

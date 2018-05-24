@@ -173,7 +173,7 @@ protected:
      * @param size  size of the matrix
      * @param num_nonzeros  number of nonzeros
      */
-    Coo(std::shared_ptr<const Executor> exec, const dim &size = dim{},
+    Coo(std::shared_ptr<const Executor> exec, const dim<2> &size = dim<2>{},
         size_type num_nonzeros = {})
         : EnableLinOp<Coo>(exec, size),
           values_(exec, num_nonzeros),
@@ -203,7 +203,7 @@ protected:
      */
     template <typename ValuesArray, typename ColIdxsArray,
               typename RowIdxsArray>
-    Coo(std::shared_ptr<const Executor> exec, const dim &size,
+    Coo(std::shared_ptr<const Executor> exec, const dim<2> &size,
         ValuesArray &&values, ColIdxsArray &&col_idxs, RowIdxsArray &&row_idxs)
         : EnableLinOp<Coo>(exec, size),
           values_{exec, std::forward<ValuesArray>(values)},
