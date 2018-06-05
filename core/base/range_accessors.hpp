@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GKO_CORE_BASE_RANGE_ACCESSORS_HPP_
 
 
+#include "core/base/dim.hpp"
 #include "core/base/range.hpp"
+#include "core/synthesizer/utils.hpp"
 
 
 #include <array>
@@ -45,6 +47,8 @@ namespace gko {
 namespace accessor {
 
 
+// TODO: this accessor should be completely replaced by the strided accessor
+//      (we can still keep a type alias called row_major for simplicity)
 /**
  * A row_major accessor is a bridge between a range and the row-major memory
  * layout.
@@ -179,6 +183,93 @@ public:
      * Distance between consecutive rows.
      */
     const size_type stride;
+};
+
+
+// TODO: computing the indexes of a non strided accessor can be optimized for
+// special cases. For example, assume a general 3D accessor which maps the
+// index (i1, i2, i3) to i1 * stride1 + i2 * stride2 + i3 * stride3. If the
+// second stride is known to be `zero`, the formula can be simplified to
+// i1 * stride1 + i3 * stride3. Similarly, if the third stride is known to be a
+// unit stride, then the formula can be further simplified to i1 * stride1 + i3.
+enum class stride_type { zero, unit, nontrivial };
+
+
+// TODO: this class should implement a general strided accessor which is a
+// generalization of vector accessors, vector with increment accessors, row
+// major and column major accessors.
+//
+// For instance, a (column) vector accessor can be obtained as strided<T, unit>.
+// A row vector accessor (where valid values are (0, 0), (0, 1), ... (0, k)) can
+// be obtained as strided<T, zero, unit>. A vector accessor with increment can
+// be obtained as strided<T, nontrivial>.
+//
+// A row-major matrix accessor is obtained as strided<T, nontrivial, unit>.
+// A column-major matrix accessor is obitained as strided<T, unit, nontrivial>.
+//
+// Note that this class is just a reference of what has to be done. The code
+// compiles, but it is not verified if it can be instantiated with different
+// template parameters, or if it works correctly.
+template <typename ValueType, stride_type... StrideTypes>
+class strided {
+public:
+    friend class range<strided>;
+
+    using value_type = ValueType;
+
+    using data_type = value_type *;
+
+    static constexpr size_type dimensionality = sizeof...(StrideTypes);
+
+    static constexpr size_type num_nontrivial_strides =
+        get_num_nontrivial_strides(StrideTypes...);
+
+protected:
+    template <typename... Strides>
+    GKO_ATTRIBUTES constexpr explicit strided(data_type data,
+                                              dim<dimensionality> lengths,
+                                              const Strides &... strides)
+        : data{data}, lengths{lengths}, strides{strides...}
+    {}
+
+public:
+    template <typename... DimensionTypes>
+    GKO_ATTRIBUTES auto operator()(const DimensionTypes &... dimensions)
+        -> void /* TODO: compute what should be the return type */
+    {
+        // TODO: this should return a value, or a subrange depending on the
+        // passed in input parameters. It should do it efficiently, by taking
+        // into account the trivial and non-trivial strides, and avoiding
+        // unnecessary computations for strides that are known to be trivial.
+        //
+        // The implementation of this will require a lot of template
+        // merafunctions that handle compile-time sequences of types / values
+        // and create different functionality depending on those sequences.
+        // Metafunctions that are not particularly related to accessors and
+        // could be used in other contexts should go into the core/synthesizer/
+        // directory.
+    }
+
+    // TODO: implement other accessor functions - see row_major accessor for
+    // details
+
+private:
+    static constexpr size_type get_num_nontrivial_strides() { return 0u; }
+
+    // gets the number of nontrivial stride types among all parameters passed to
+    // the function
+    template <typename... Rest>
+    static constexpr size_type get_num_nontrivial_strides(
+        const stride_type &first, const Rest &... rest)
+    {
+        return get_num_nontrivial_strides(rest...) +
+               (first == stride_type::nontrivial);
+    }
+
+
+    const data_type data;
+    const gko::dim<dimensionality> lengths;
+    const gko::dim<num_nontrivial_strides> strides;
 };
 
 
