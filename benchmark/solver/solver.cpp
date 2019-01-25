@@ -341,6 +341,8 @@ void solve_system(
 
     // timed run
     {
+        auto it_logger = std::make_shared<IterationLogger>(exec);
+
         auto x_clone = clone(x);
 
         exec->synchronize();
@@ -358,12 +360,17 @@ void solve_system(
                           generate_time.count(), allocator);
 
         exec->synchronize();
+
+        solver->add_logger(it_logger);
         auto a_tic = std::chrono::steady_clock::now();
 
         solver->apply(lend(b), lend(x_clone));
 
         exec->synchronize();
         auto a_tac = std::chrono::steady_clock::now();
+
+        it_logger->write_data(solver_json["apply"], allocator);
+
         auto apply_time =
             std::chrono::duration_cast<std::chrono::nanoseconds>(a_tac - a_tic);
         add_or_set_member(solver_json["apply"], "time", apply_time.count(),
